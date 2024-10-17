@@ -4,7 +4,7 @@ from urllib import parse
 import urllib.request
 
 hostName = "localhost"
-serverPort = 80
+serverPort = 1111
 
 class MyServer(BaseHTTPRequestHandler):
     
@@ -20,10 +20,19 @@ class MyServer(BaseHTTPRequestHandler):
     
     def do_GET(self):
         # TO-DO: Handle GET requests for our secure resource
+        print("GET REQUEST SecureStorage.py")
+        if self.getURI() == '/':
+            self.set_headers(200)
+            self.wfile.write(self.getURI().encode())
+            html = open("TestAuth.html")
+            htmlString = html.read()
+            html.close()
+            self.wfile.write(bytes(htmlString, "utf-8"))
 
     def getToken(self, token):
         # TO-DO: Fetches/caches a token for a set period of time, automatically re-fetches old tokens
-            
+        print("getTokens SecureStorage.py")
+        
     # Gets the query parameters of a request and returns them as a dictionary
     def getParams(self):
         output = {}
@@ -34,12 +43,12 @@ class MyServer(BaseHTTPRequestHandler):
         return output
     
     # Returns a string containing the page (path) that the request was for
-    def getPage(self):
+    def getURI(self):
         return parse.urlsplit(self.path).path
 
 if __name__ == "__main__":        
     webServer = HTTPServer((hostName, serverPort), MyServer)
-    print("Server started at 127.0.0.1:80")
+    print("Server started at 127.0.0.1:1111")
 
     try:
         webServer.serve_forever()

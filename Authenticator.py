@@ -20,12 +20,49 @@ class MyServer(BaseHTTPRequestHandler):
     
     def do_GET(self):
         # TO-DO: Handle GET Requests
-        
+        print("GET request Authenticator.py")
+        if self.getURI()[1:] in self.tokens.keys():
+            self.set_headers(200)
+            self.wfile.write(bytes(self.tokens[self.getURI()[1:]] + " is the token", "utf-8"))
+            
+        elif self.getURI() == '/logout':
+            clientIP = self.client_address[0]
+            for key, value in dict(self.tokens).items():
+                del self.tokens[key]
+                self.set_headers(200)
+                self.wfile.write(bytes("logout succesful \n" + clientIP, "utf-8"))
+        else:
+            self.set_headers(404)
+            self.wfile.write(bytes("404 URI not found", "utf-8"))
+            
     def do_POST(self):
         # TO-DO: Handle POST Requests
+        print("POST REQUEST Authenticator.py")
+        if self.getURI() == '/login':
+            requestData = self.getRequestData()
+            if requestData['username'] in self.logins.keys():
+                if self.logins[requestData['username']] == requestData['password']:
+                    clientIP = self.client_address[0]
+                    if clientIP not in self.tokens.values():
+                        token = str(uuid.uuid4())
+                        self.tokens[token] = clientIP
+                        self.set_headers(200)
+                        self.wfile.write(bytes("Login successful, your token: " + token, "utf-8"))
+                    else:
+                        self.set_headeres(409)
+                        self.wfile.write(bytes("Login failed: IP already in use","utf-8"))
+                else:
+                    self.set_headers(401)
+                    self.wfile.write(bytes("Login failed: username or password incorrect", "utf-8"))
+            else:
+                self.set_headers(401)
+                self.wfile.write(bytes("Login failed: username does not exist", "utf-8"))
+        else:
+            self.set_headers(404)
+            self.wfile.write("page not found", "utf-8")
         
     # Fetches the requested path
-    def getPage(self):
+    def getURI(self):
         return parse.urlsplit(self.path).path
     
     # Fetches the request body data (i.e. POST request parameters)
