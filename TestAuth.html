@@ -94,7 +94,7 @@
 						outputDiv.innerHTML = this.responseText;
 					  }
 					};
-					xhttp.open("POST", "http://127.0.0.1:1111/login", true);
+					xhttp.open("POST", "http://127.0.0.1:8080/login", true);
 					xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
 					xhttp.send(params);
 				}
@@ -108,7 +108,7 @@
 						outputDiv.innerHTML = this.responseText;
 					  }
 					}
-					xhttp.open("GET", "http://127.0.0.1:1111/logout", true);
+					xhttp.open("GET", "http://127.0.0.1:8080/logout", true);
 					xhttp.send();
 				}
 				const tokenForm = document.getElementById( "request" );

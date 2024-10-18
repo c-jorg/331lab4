@@ -36,6 +36,8 @@ class MyServer(BaseHTTPRequestHandler):
                 clientIP = self.client_address[0]
                 fetchedIP = self.getToken(parameters.get('token'))
                 
+                print("clientIP = " + clientIP + " fetchedIP = " + fetchedIP)
+                
                 if clientIP == fetchedIP:
                     self.set_headers(200)
                     self.wfile.write(self.getURI().encode())

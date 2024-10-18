@@ -23,7 +23,7 @@ class MyServer(BaseHTTPRequestHandler):
         print("GET request Authenticator.py")
         if self.getURI()[1:] in self.tokens.keys():
             self.set_headers(200)
-            self.wfile.write(bytes(self.tokens[self.getURI()[1:]] + " is the token", "utf-8"))
+            self.wfile.write(bytes(self.tokens[self.getURI()[1:]], "utf-8"))
             
         elif self.getURI() == '/logout':
             clientIP = self.client_address[0]
