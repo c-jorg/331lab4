@@ -8,7 +8,7 @@ serverPort = 8080
 class MyServer(BaseHTTPRequestHandler):
     
     tokens = {}
-    logins = {"myUser":"myPassword"}
+    logins = {"myUser":"myPassword","test":"letmein"}
     
     # Set the HTTP status code and response headers
     def set_headers(self, responseCode):

@@ -21,17 +21,57 @@ class MyServer(BaseHTTPRequestHandler):
     def do_GET(self):
         # TO-DO: Handle GET requests for our secure resource
         print("GET REQUEST SecureStorage.py")
-        if self.getURI() == '/':
+        if self.getURI() == '/lab4':
             self.set_headers(200)
             self.wfile.write(self.getURI().encode())
             html = open("TestAuth.html")
             htmlString = html.read()
             html.close()
             self.wfile.write(bytes(htmlString, "utf-8"))
+            
+        if self.getURI() == '/':
+            print("checking tokens")
+            parameters = self.getParams()
+            if parameters.get('token'):
+                clientIP = self.client_address[0]
+                fetchedIP = self.getToken(parameters.get('token'))
+                
+                if clientIP == fetchedIP:
+                    self.set_headers(200)
+                    self.wfile.write(self.getURI().encode())
+                    html = open('success.html')
+                    htmlString = html.read();
+                    html.close()
+                    self.wfile.write(bytes(htmlString, "utf-8"))
+                else:
+                    self.set_headers(401)
+                    self.wfile.write(bytes("Client and token do not match!", "utf-8"))
+            else:
+                self.set_headers(401)
+                self.wfile.write(bytes("No token provided!","utf-8"))
+                    
 
     def getToken(self, token):
         # TO-DO: Fetches/caches a token for a set period of time, automatically re-fetches old tokens
         print("getTokens SecureStorage.py")
+        
+        if token == 'logout':
+            return None
+        if token not in self.tokens:
+            try:
+                fetchedIP = urllib.request.urlopen('http://127.0.0.1:8080/' + token).read()
+                fetchedIP = fetchedIP.decode('utf-8')
+                self.tokens[token] = [fetchedIP, time.time()]
+                return fetchedIP
+            except:
+                return None
+        else:
+            tokenVals = self.tokens[token]
+            if time.time() - tokenVals[1] > 300:
+               del self.tokens[token]
+               return self.getToken(token)
+            else:
+               return tokenVals[0]
         
     # Gets the query parameters of a request and returns them as a dictionary
     def getParams(self):
